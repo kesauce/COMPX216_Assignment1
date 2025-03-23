@@ -1,6 +1,7 @@
 from time import time
 from search import *
 from assignment1aux import *
+from heapq import *
 
 def read_initial_state_from_file(filename):
     # Task 1
@@ -151,34 +152,27 @@ def astar_heuristic_cost(node):
     row_counter = 0
     column_counter = 0
 
-    # If the map is longer
-    if(height > width):
-        # Running a for loop doing the columns first
-        for j in range(width):
-            for i in range(height):
-
-                # If the value is empty then count the entire column as empty and move on to the next column
-                if map[i][j].strip() == "":
-                    column_counter += 1
-                    break 
-       
-        
-        # Return the column count
-        return column_counter
-
-    # If the map is wider       
-    elif(height <= width):
-        # Running a for loop doing the columns first
+    # Running a for loop doing the columns first
+    for j in range(width):
         for i in range(height):
-            for j in range(width):
+            # If the value is empty then count the entire column as empty and move on to the next column
+            if map[i][j].strip() == "":
+                column_counter += 1
+                break                
 
-                # If the value is empty then count the entire row as empty and move on to the next row
-                if map[i][j].strip() == "":
-                    row_counter += 1
-                    break
+    # Running a for loop doing the columns first
+    for i in range(height):
+        for j in range(width):
+            # If the value is empty then count the entire row as empty and move on to the next row
+            if map[i][j].strip() == "":
+                row_counter += 1
+                break
         
-        # Return row counter
+    # Return the smallest count
+    if column_counter > row_counter:
         return row_counter
+    else:
+        return column_counter
     
 
 def beam_search(problem, f, beam_width):
@@ -186,22 +180,22 @@ def beam_search(problem, f, beam_width):
     # Implement a beam-width version A* search.
     # Return a search node containing a solved state.
     # Experiment with the beam width in the test code to find a solution.
-    # Replace the line below with your code.
 
     
-    # idk
+    # Initialise the display just as in search.py 
     display = False
+
     # Copied the best_first_graph_search() function in search.py
     f = memoize(f, 'f')
     node = Node(problem.initial)
     frontier = PriorityQueue('min', f)
     frontier.append(node)
     
-    # Delete the nodes past 50
-    for i in range(frontier.__len__()):
-        if i > beam_width:
-            frontier.pop()
+    # Only keep the smallest beam_width nodes
+    if frontier.heap.__len__() > beam_width:
+        frontier.heap = nsmallest(beam_width, frontier.heap)
 
+    # The rest of the code in search.py
     explored = set()
     while frontier:
         node = frontier.pop()
@@ -219,18 +213,14 @@ def beam_search(problem, f, beam_width):
                     frontier.append(child)
     return None
 
-
-
-    raise NotImplementedError
-
 if __name__ == "__main__":
 
     # Task 1 test code
     print('The loaded initial state is visualised below.')
-    visualise(read_initial_state_from_file("C:/Users/alexi/Documents/University/2nd Year/COMPX216/Assignment 1/aima-python/aima-python/assignment1config.txt"))
+    visualise(read_initial_state_from_file("C:/Users/alexi/Documents/University/2nd Year/COMPX216/Assignment 1/aima-python/aima-python/assignment1config2.txt"))
 
     # Task 2 test code
-    garden = ZenPuzzleGarden('C:/Users/alexi/Documents/University/2nd Year/COMPX216/Assignment 1/aima-python/aima-python/assignment1config.txt')
+    garden = ZenPuzzleGarden('C:/Users/alexi/Documents/University/2nd Year/COMPX216/Assignment 1/aima-python/aima-python/assignment1config2.txt')
     print('Running breadth-first graph search.')
     before_time = time()
     node = breadth_first_graph_search(garden)
