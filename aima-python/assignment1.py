@@ -190,12 +190,6 @@ def beam_search(problem, f, beam_width):
     node = Node(problem.initial)
     frontier = PriorityQueue('min', f)
     frontier.append(node)
-    
-    # Only keep the smallest beam_width nodes
-    if frontier.heap.__len__() > beam_width:
-        frontier.heap = nsmallest(beam_width, frontier.heap)
-
-    # The rest of the code in search.py
     explored = set()
     while frontier:
         node = frontier.pop()
@@ -211,6 +205,10 @@ def beam_search(problem, f, beam_width):
                 if f(child) < frontier[child]:
                     del frontier[child]
                     frontier.append(child)
+        
+        # Only keep the smallest beam_width nodes
+        if frontier.heap.__len__() > beam_width:
+            frontier.heap = nsmallest(beam_width, frontier.heap)
     return None
 
 if __name__ == "__main__":
